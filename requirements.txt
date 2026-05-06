@@ -1,4 +1,5 @@
 # Backend + Vercel deployment
+numpy>=1.24
 fastapi
 pydantic
 uvicorn
