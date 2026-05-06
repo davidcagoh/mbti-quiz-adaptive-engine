@@ -554,8 +554,11 @@
 
   // ── Confidence bar ───────────────────────────────────
   function updateConfidence() {
-    const pct = Math.max(0, Math.min(100,
-      (VAR_INITIAL - maxDiagVar(Sigma)) / (VAR_INITIAL - VAR_THRESHOLD) * 100
+    let avgVar = 0;
+    for (let i = 0; i < N_DIMS; i++) avgVar += Sigma[i * N_DIMS + i];
+    avgVar /= N_DIMS;
+    const pct = Math.max(0, Math.min(99,  // cap at 99 — 100 only when quiz actually ends
+      (VAR_INITIAL - avgVar) / (VAR_INITIAL - VAR_THRESHOLD) * 100
     ));
     const fill = document.getElementById('confidence-fill');
     fill.style.width = pct + '%';
