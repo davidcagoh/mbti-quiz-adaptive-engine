@@ -375,14 +375,54 @@
 </div>
 
 <footer class="app-footer">
-  <a href="https://github.com/davidcagoh/adaptive-quiz-personality" target="_blank" rel="noopener noreferrer">
+  <a href="https://github.com/davidcagoh/mbti-quiz-adaptive-engine" target="_blank" rel="noopener noreferrer">
     David Goh · GitHub
   </a>
 </footer>
 
 <script>
-  const API = '';  // same origin; change to 'http://localhost:8000' if opening file directly
+  // ── Bayesian engine (Kalman rank-1, matches engine/adaptive_engine/core/bayesian.py) ──
+  const SIGMA2        = 0.2;    // observation noise variance
+  const VAR_THRESHOLD = 0.1;   // VarianceThresholdStopping — stop when max diag(Σ) < this
+  const VAR_INITIAL   = 1.0;   // prior variance per dimension (σ₀² = 1)
+  const N_DIMS        = 4;
 
+  function matVec(A, v) {
+    return v.map((_, i) => v.reduce((s, vj, j) => s + A[i * N_DIMS + j] * vj, 0));
+  }
+  function dot(a, b) { return a.reduce((s, ai, i) => s + ai * b[i], 0); }
+
+  function bayesianUpdate(mu, Sigma, w, y) {
+    const Sw       = matVec(Sigma, w);
+    const s        = dot(w, Sw) + SIGMA2;
+    const k        = Sw.map(v => v / s);
+    const residual = y - dot(w, mu);
+    const muNew    = mu.map((m, i) => m + k[i] * residual);
+    const SigmaNew = Sigma.slice();
+    for (let i = 0; i < N_DIMS; i++)
+      for (let j = 0; j < N_DIMS; j++)
+        SigmaNew[i * N_DIMS + j] -= k[i] * Sw[j];
+    return { mu: muNew, Sigma: SigmaNew };
+  }
+
+  function selectNextQuestion(questions, asked, mu, Sigma) {
+    let bestIdx = -1, bestScore = -Infinity;
+    questions.forEach((q, idx) => {
+      if (asked.has(q.id)) return;
+      const Sw    = matVec(Sigma, q.weights);
+      const score = dot(q.weights, Sw);
+      if (score > bestScore) { bestScore = score; bestIdx = idx; }
+    });
+    return bestIdx;
+  }
+
+  function maxDiagVar(Sigma) {
+    let max = 0;
+    for (let i = 0; i < N_DIMS; i++) max = Math.max(max, Sigma[i * N_DIMS + i]);
+    return max;
+  }
+
+  // ── Descriptions / dimension config ─────────────────
   const DESCRIPTIONS = {
     INTJ: 'The Architect — strategic, independent, high standards. Sees the big picture and builds systems to realise it.',
     INTP: 'The Logician — analytical, inventive, loves theories. Seeks logical precision above all.',
@@ -402,35 +442,37 @@
     ESFP: 'The Entertainer — spontaneous, playful, warm. Brings fun and energy wherever they go.',
   };
 
-  // Dimension config: [apiKey, leftLabel, rightLabel]
-  // apiKey value > 0 → right letter is favoured
+  // mu[i] >= 0 → right letter; negative → left letter
   const DIMS = [
-    { key: 'E-I', left: 'I',  right: 'E',  label: 'Energy'      },
-    { key: 'N-S', left: 'S',  right: 'N',  label: 'Perception'  },
-    { key: 'T-F', left: 'F',  right: 'T',  label: 'Judgement'   },
-    { key: 'J-P', left: 'P',  right: 'J',  label: 'Lifestyle'   },
+    { idx: 0, left: 'I', right: 'E', label: 'Energy'     },
+    { idx: 1, left: 'S', right: 'N', label: 'Perception' },
+    { idx: 2, left: 'F', right: 'T', label: 'Judgement'  },
+    { idx: 3, left: 'P', right: 'J', label: 'Lifestyle'  },
   ];
 
-  const BATCH_SIZE    = 3;
-  const SIGMA_INITIAL = 1.0;  // identity prior std dev
-
   // ── State ────────────────────────────────────────────
-  let sessionId        = null;
-  let questionsAsked   = 0;
-  let maxQuestions     = 80;
-  let busy             = false;
-  let questionShownAt  = null;  // timestamp (ms) when current question was rendered
+  let allQuestions  = [];
+  let mu            = [0, 0, 0, 0];
+  let Sigma         = [];
+  let asked         = new Set();
+  let questionsAsked = 0;
+  let currentQ      = null;
+  let busy          = false;
 
-  // Batching state
-  let questionBuffer   = [];   // pre-fetched questions not yet shown
-  let pendingAnswers   = [];   // answers collected locally, not yet POSTed
+  function initPrior() {
+    mu    = [0, 0, 0, 0];
+    Sigma = Array(N_DIMS * N_DIMS).fill(0);
+    for (let i = 0; i < N_DIMS; i++) Sigma[i * N_DIMS + i] = VAR_INITIAL;
+    asked          = new Set();
+    questionsAsked = 0;
+    currentQ       = null;
+  }
 
-  // ── Screens ──────────────────────────────────────────
+  // ── Screens / errors ─────────────────────────────────
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
-
   function showError(elementId, msg) {
     const el = document.getElementById(elementId);
     el.textContent = msg;
@@ -440,45 +482,32 @@
     document.getElementById(elementId).style.display = 'none';
   }
 
-  // ── API helpers ──────────────────────────────────────
-  async function apiPost(path, body) {
-    const res = await fetch(API + path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: res.statusText }));
-      throw new Error(err.detail || res.statusText);
-    }
-    return res.json();
-  }
-
-  async function apiGet(path) {
-    const res = await fetch(API + path);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: res.statusText }));
-      throw new Error(err.detail || res.statusText);
-    }
-    return res.json();
-  }
-
   // ── Quiz flow ─────────────────────────────────────────
   async function startQuiz() {
     if (busy) return;
     busy = true;
     hideError('welcome-error');
     document.getElementById('btn-start').disabled = true;
-    document.getElementById('btn-start').innerHTML = '<span class="spinner"></span>Starting…';
+    document.getElementById('btn-start').innerHTML = '<span class="spinner"></span>Loading…';
 
     try {
-      const data = await apiPost('/start_quiz', { schema_name: 'mbti', batch_size: BATCH_SIZE });
-      sessionId      = data.session_id;
-      maxQuestions   = data.max_questions || 80;
-      questionsAsked = 0;
-      questionBuffer = data.next_questions.slice();
-      pendingAnswers = [];
-      showNextFromBuffer();
+      if (allQuestions.length === 0) {
+        const res = await fetch('/static/mbti.json');
+        if (!res.ok) throw new Error('Could not load quiz questions');
+        const schema = await res.json();
+        allQuestions = schema.questions;
+      }
+      // Shuffle for acquiescence-bias reduction
+      const qs = allQuestions.slice();
+      for (let i = qs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [qs[i], qs[j]] = [qs[j], qs[i]];
+      }
+      allQuestions = qs;
+
+      initPrior();
+      resetConfidence();
+      advanceQuestion();
       showScreen('screen-question');
     } catch (e) {
       showError('welcome-error', 'Could not start quiz: ' + e.message);
@@ -489,131 +518,80 @@
     }
   }
 
-  function showNextFromBuffer() {
-    const q = questionBuffer.shift();
-    renderQuestion(q.question_id, q.prompt, questionsAsked);
+  function advanceQuestion() {
+    const idx = selectNextQuestion(allQuestions, asked, mu, Sigma);
+    if (idx === -1) { showResult(); return; }
+    currentQ = allQuestions[idx];
+    renderQuestion(currentQ.id, currentQ.text, questionsAsked);
   }
 
-  async function submitAnswer(value) {
-    if (busy) return;
+  function submitAnswer(value) {
+    if (!currentQ) return;
+    const { mu: mu2, Sigma: S2 } = bayesianUpdate(mu, Sigma, currentQ.weights, value);
+    mu    = mu2;
+    Sigma = S2;
+    asked.add(currentQ.id);
+    questionsAsked++;
+    updateConfidence();
 
-    const responseTime = questionShownAt ? (Date.now() - questionShownAt) / 1000 : 1.0;
-    questionShownAt = null;
-
-    // Record the current question id before shifting
-    const currentQuestionId = document.getElementById('question-text').dataset.questionId;
-    pendingAnswers.push({ question_id: currentQuestionId, response: value, response_time: responseTime });
-    questionsAsked += 1;
-
-    if (questionBuffer.length > 0) {
-      // Show next question immediately — no server round-trip needed yet
-      nudgeConfidence();
-      showNextFromBuffer();
+    if (maxDiagVar(Sigma) < VAR_THRESHOLD || asked.size >= allQuestions.length) {
+      showResult();
     } else {
-      // Buffer empty: flush pending answers and fetch next batch
-      busy = true;
-      lockLikert(true);
-      hideError('question-error');
-      try {
-        const data = await apiPost('/answer', { session_id: sessionId, answers: pendingAnswers });
-        pendingAnswers = [];
-        questionsAsked = data.questions_asked || questionsAsked;
-
-        confirmConfidence(data.uncertainties);
-        if (data.complete) {
-          await loadResult();
-        } else {
-          questionBuffer = data.next_questions.slice();
-          showNextFromBuffer();
-        }
-      } catch (e) {
-        showError('question-error', 'Error: ' + e.message);
-        lockLikert(false);
-      } finally {
-        busy = false;
-      }
+      advanceQuestion();
     }
   }
 
-  async function loadResult() {
-    try {
-      const data = await apiGet('/result?session_id=' + encodeURIComponent(sessionId));
-      renderResult(data);
-      showScreen('screen-result');
-    } catch (e) {
-      showError('question-error', 'Could not load result: ' + e.message);
-      lockLikert(false);
-    }
+  function showResult() {
+    const type = [
+      mu[0] >= 0 ? 'E' : 'I',
+      mu[1] >= 0 ? 'N' : 'S',
+      mu[2] >= 0 ? 'T' : 'F',
+      mu[3] >= 0 ? 'J' : 'P',
+    ].join('');
+    renderResult(type, questionsAsked, mu);
+    showScreen('screen-result');
   }
 
   // ── Confidence bar ───────────────────────────────────
-  const SIGMA_STOP = Math.sqrt(0.1);   // VarianceThresholdStopping(0.1) → σ ≈ 0.316
-  const U_DIMS     = ['EI', 'NS', 'TF', 'JP'];
-  let   confirmedConfidence = 0;       // last real value from server
-
-  function _sigmasToConfidence(uncertainties) {
-    const vals = U_DIMS.map(d => uncertainties[d] ?? SIGMA_INITIAL);
-    const avg  = vals.reduce((s, σ) => s + (SIGMA_INITIAL - σ) / (SIGMA_INITIAL - SIGMA_STOP), 0) / vals.length;
-    return Math.max(0, Math.min(100, avg * 100));
-  }
-
-  function _setConfidenceFill(pct, pulse = false) {
+  function updateConfidence() {
+    const pct = Math.max(0, Math.min(100,
+      (VAR_INITIAL - maxDiagVar(Sigma)) / (VAR_INITIAL - VAR_THRESHOLD) * 100
+    ));
     const fill = document.getElementById('confidence-fill');
-    if (!fill) return;
     fill.style.width = pct + '%';
-    if (pulse) {
-      fill.classList.remove('pulse');
-      void fill.offsetWidth;  // force reflow to restart animation
-      fill.classList.add('pulse');
-    }
-  }
-
-  function nudgeConfidence() {
-    // Optimistic per-answer bump so the bar moves on every answer, not just batch flush.
-    // Capped well below 100 so real server values (which are always >= confirmed) snap cleanly.
-    const nudged = Math.min(confirmedConfidence + 3, 88);
-    _setConfidenceFill(nudged, true);
-  }
-
-  function confirmConfidence(uncertainties) {
-    if (!uncertainties || !uncertainties.EI) return;
-    confirmedConfidence = _sigmasToConfidence(uncertainties);
-    _setConfidenceFill(confirmedConfidence);
+    fill.classList.remove('pulse');
+    void fill.offsetWidth;
+    fill.classList.add('pulse');
   }
 
   function resetConfidence() {
-    confirmedConfidence = 0;
-    _setConfidenceFill(0);
+    document.getElementById('confidence-fill').style.width = '0%';
   }
 
   // ── Rendering ────────────────────────────────────────
-  function renderQuestion(questionId, prompt, asked) {
+  function renderQuestion(id, text, asked) {
     const el = document.getElementById('question-text');
-    el.textContent = prompt;
-    el.dataset.questionId = questionId;
+    el.textContent = text;
+    el.dataset.questionId = id;
     document.getElementById('q-label').textContent = 'Question ' + (asked + 1);
     document.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
     lockLikert(false);
-    questionShownAt = Date.now();
   }
 
-  function renderResult(data) {
-    const type = data.type || '????';
+  function renderResult(type, nAsked, muVec) {
     document.getElementById('type-badge').textContent = type;
     document.getElementById('type-description').textContent =
       DESCRIPTIONS[type] || 'A unique blend of traits.';
     document.getElementById('questions-taken').textContent =
-      '✓ Completed in ' + data.questions_asked + ' questions';
+      '✓ Completed in ' + nAsked + ' questions';
 
     const container = document.getElementById('dimensions');
     container.innerHTML = '';
-
     DIMS.forEach(dim => {
-      const raw = data.dimensions[dim.key] ?? 0;
-      // Map raw score [-1.5, 1.5] → [0%, 100%]; 0 → 50%
-      const pct = Math.min(100, Math.max(0, (raw + 1.5) / 3 * 100));
+      const raw         = muVec[dim.idx];
+      // Map mu roughly in [-2, 2] → [0%, 100%]; 0 → 50%
+      const pct         = Math.min(100, Math.max(0, (raw + 2) / 4 * 100));
       const rightActive = raw >= 0;
-
       const row = document.createElement('div');
       row.className = 'dim-row';
       row.innerHTML = `
@@ -632,8 +610,7 @@
   function lockLikert(locked) {
     document.querySelectorAll('.likert-btn').forEach(b => {
       b.disabled = locked;
-      if (locked) b.style.opacity = '0.6';
-      else b.style.opacity = '';
+      b.style.opacity = locked ? '0.6' : '';
     });
   }
 
@@ -645,16 +622,13 @@
     if (!btn || btn.disabled) return;
     document.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    lockLikert(true);  // prevent double-click during visual feedback delay
+    lockLikert(true);
     const value = parseFloat(btn.dataset.value);
-    setTimeout(() => submitAnswer(value), 180);  // brief visual feedback before submitting
+    setTimeout(() => submitAnswer(value), 180);
   });
 
   document.getElementById('btn-restart').addEventListener('click', () => {
-    sessionId      = null;
-    questionsAsked = 0;
-    questionBuffer = [];
-    pendingAnswers = [];
+    initPrior();
     resetConfidence();
     document.getElementById('btn-start').disabled = false;
     document.getElementById('btn-start').textContent = 'Start Quiz';

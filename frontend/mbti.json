@@ -1,0 +1,828 @@
+{
+  "name": "MBTI",
+  "_source": "IPIP-NEO 300-item (Goldberg 1999). Facets: E1 Friendliness, E2 Gregariousness (EI); O1 Imagination, O5 Intellect (NS); A3 Altruism, A6 Sympathy (TF, inverted); C2 Orderliness, C5 Self-Discipline (JP). Public domain: ipip.ori.org",
+  "dimensions": [
+    {
+      "name": "EI",
+      "positive": "E",
+      "negative": "I"
+    },
+    {
+      "name": "NS",
+      "positive": "N",
+      "negative": "S"
+    },
+    {
+      "name": "TF",
+      "positive": "T",
+      "negative": "F"
+    },
+    {
+      "name": "JP",
+      "positive": "J",
+      "negative": "P"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Make friends easily.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Warm up quickly to others.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Feel comfortable around people.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Act comfortably with others.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Cheer people up.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Am hard to get to know.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Often feel uncomfortable around others.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "Avoid contacts with others.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "Am not really interested in others.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q10",
+      "text": "Keep others at a distance.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q11",
+      "text": "Love large parties.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q12",
+      "text": "Talk to a lot of different people at parties.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q13",
+      "text": "Enjoy being part of a group.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q14",
+      "text": "Involve others in what I am doing.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q15",
+      "text": "Love surprise parties.",
+      "weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q16",
+      "text": "Prefer to be alone.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q17",
+      "text": "Want to be left alone.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q18",
+      "text": "Don't like crowded events.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q19",
+      "text": "Avoid crowds.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q20",
+      "text": "Seek quiet.",
+      "weights": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q21",
+      "text": "Have a vivid imagination.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q22",
+      "text": "Enjoy wild flights of fantasy.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q23",
+      "text": "Love to daydream.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q24",
+      "text": "Like to get lost in thought.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q25",
+      "text": "Indulge in my fantasies.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q26",
+      "text": "Spend time reflecting on things.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q27",
+      "text": "Seldom daydream.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q28",
+      "text": "Do not have a good imagination.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q29",
+      "text": "Seldom get lost in thought.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q30",
+      "text": "Have difficulty imagining things.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q31",
+      "text": "Like to solve complex problems.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q32",
+      "text": "Love to read challenging material.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q33",
+      "text": "Have a rich vocabulary.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q34",
+      "text": "Can handle a lot of information.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q35",
+      "text": "Enjoy thinking about things.",
+      "weights": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q36",
+      "text": "Am not interested in abstract ideas.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q37",
+      "text": "Avoid philosophical discussions.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q38",
+      "text": "Have difficulty understanding abstract ideas.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q39",
+      "text": "Am not interested in theoretical discussions.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q40",
+      "text": "Avoid difficult reading material.",
+      "weights": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q41",
+      "text": "Make people feel welcome.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q42",
+      "text": "Anticipate the needs of others.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q43",
+      "text": "Love to help others.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q44",
+      "text": "Am concerned about others.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q45",
+      "text": "Have a good word for everyone.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q46",
+      "text": "Look down on others.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q47",
+      "text": "Am indifferent to the feelings of others.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q48",
+      "text": "Make people feel uncomfortable.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q49",
+      "text": "Turn my back on others.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q50",
+      "text": "Take no time for others.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q51",
+      "text": "Sympathize with the homeless.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q52",
+      "text": "Feel sympathy for those who are worse off than myself.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q53",
+      "text": "Value cooperation over competition.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q54",
+      "text": "Suffer from others' sorrows.",
+      "weights": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q55",
+      "text": "Am not interested in other people's problems.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q56",
+      "text": "Tend to dislike soft-hearted people.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q57",
+      "text": "Believe in an eye for an eye.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q58",
+      "text": "Try not to think about the needy.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q59",
+      "text": "Believe people should fend for themselves.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q60",
+      "text": "Can't stand weak people.",
+      "weights": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "q61",
+      "text": "Like order.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q62",
+      "text": "Like to tidy up.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q63",
+      "text": "Want everything to be just right.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q64",
+      "text": "Love order and regularity.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q65",
+      "text": "Do things according to a plan.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q66",
+      "text": "Often forget to put things back in their proper place.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q67",
+      "text": "Leave a mess in my room.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q68",
+      "text": "Leave my belongings around.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q69",
+      "text": "Am not bothered by messy people.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q70",
+      "text": "Am not bothered by disorder.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q71",
+      "text": "Get chores done right away.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q72",
+      "text": "Am always prepared.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q73",
+      "text": "Start tasks right away.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q74",
+      "text": "Get to work at once.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q75",
+      "text": "Carry out my plans.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "q76",
+      "text": "Find it difficult to get down to work.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q77",
+      "text": "Waste my time.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q78",
+      "text": "Need a push to get started.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q79",
+      "text": "Have difficulty starting tasks.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "q80",
+      "text": "Postpone decisions.",
+      "weights": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ]
+    }
+  ]
+}
