@@ -1,5 +1,4 @@
 # Backend + Vercel deployment
--e ../engine
 fastapi
 pydantic
 uvicorn
